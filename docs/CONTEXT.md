@@ -39,15 +39,18 @@
 - **形态**：编辑全作用域 + 生效链 + 历史；不做片段/多文件（ADR-0001）。
 - **边界**：只编辑宿主真正加载的指令文件，不做 system-prompt 注入（ADR-0001）。
 - **写入**：服务端白名单 + `replaceIfVersion` 409 + 原子 `.bak` + loopback/同源/JSON/1 MiB（ADR-0002）。
-- **生成**：v1 设置页按钮，插件采集仓库事实 + 一次模型调用；已存在文件出「改进提案」diff，逐块接受；v1.1 再评估 `/init`（ADR-0003）。
+- **生成**：v1 设置页按钮，项目文件采集仓库事实、全局文件仅整理自身已有规则（空文件出 TODO 模板）+ 一次模型调用；已存在文件出「改进提案」diff，逐块接受；v1.1 再评估 `/init`（ADR-0003）。
 - **生效链**：静态计算为主 + 当前会话实况 best effort；只说宿主真实行为，不假装「已生效」（ADR-0004）。
 - **历史**：扫 `.bak-*` + 轻索引，diff 与回滚；回滚本身可撤销（ADR-0005）。
 - **发布**：`dsh-agents-desk`，MIT，开源 + npm，zh/en，目标宿主 0.2.1-rc.2，启动自检（ADR-0006）。
 - **命名**：工作名即正式名 `dsh-agents-desk`；GitHub `Cassius0924/dsh-agents-desk`。
 
-## 实施状态（2026-10-22）
+## 实施状态（2026-10-22，v0.2.0）
 
-- v1 已在本机 web profile 跑通：作用域树（两个全局根 + 项目链 + 子目录扫描）、编辑器、版本冲突 409、原子备份、历史列表/diff/回滚、静态生效链（去重/1 MiB/64 KiB）、生成草稿与逐块提案、zh/en。
-- 验收方式：`node --test`（作用域/去重/预算/白名单/diff）；host 路由用 cookie 直调；设置页用 `dsh-ui-probe.mjs` 的 `DSH_PROBE_SETTINGS` 模式实测。
-- 未做（v1.1）：当前会话已注入 digest 的实况对比（`sessionPersistence` 句柄读取）、`/init` 命令、npm 发布。
+- v1 在本机 web profile 跑通：作用域树（两个全局根 + 项目链 + 子目录候选）、编辑器、版本冲突 409、历史列表/diff/回滚、生成草稿与逐块提案、zh/en。
+- v0.2 起生效链改为**宿主同构复算**：按 `render.ts` 的 suffix-drop / 单文件截断 / UTF-8 边界、完整提示文本计入预算、trimmed SHA-1 去重（空文件同组）、全局显示路径按 `~/.dsh`、`$DSH_HOME` 规则；返回值带 `assumptions` 说明默认 64 KiB / 1 MiB / 四候选名。已与宿主 `renderAgentInstructions` 在多组预算下逐字节比对。
+- v0.2 收紧读取路由（历史/diff 必须带 `cwd` 并过白名单）、拒绝符号链接写入并校验 `processPath` 真实路径、备份改为写成功后用写前文本落盘、`/health` 能力自检、统一 `{error, code, status}`，客户端做 code 本地化与请求竞态/脏值保护。
+- 验收方式：`node --test test/*.test.mjs`（38 项：渲染/预算/发现/去重/路由/错误码/符号链接/备份/回滚/生成 effort/全局生成隔离/大文件 diff）；路由用 fake ctx 单测；`DSH_ROOT=/path/to/deepseek-harness node test/browser.mjs` 用真实 Chromium 挂载客户端与模拟宿主响应，验证回滚版本、取消 diff、15 万行提案合并保存、移动端溢出与全局草稿操作；设置页另用真实 web profile 实测。
+- 数据完整性：回滚携带编辑器版本并通过宿主原子写入校验，拒绝静默覆盖外部修改；历史来源按完整备份路径隔离；备份读取先检查 1 MiB 上限。发现包含 `lib/` 源码目录，扫描深度不再限制项目链内指令文件的编辑。大文件 diff 先裁共同前后缀，合并不用参数展开；关闭差异面板会取消请求并清理加载状态。
+- 未做（v1.1）：当前会话已注入 digest 的实况对比（`sessionPersistence` 句柄读取）、预设级预算读取、`/init` 命令、npm 发布。
 

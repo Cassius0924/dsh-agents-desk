@@ -17,7 +17,7 @@ DSH 里实现有两条路：
 v1 做 host 侧生成，行为对齐 Codex/Claude：
 
 1. 入口：设置页 → 选中作用域（默认项目根）→「生成草稿」。
-2. 事实采集由插件做，只喂确定性事实：`package.json` scripts/deps、锁文件类型、`go.mod`/`Makefile`/`pyproject.toml`/`Cargo.toml`、顶层目录、README 标题、现有 `AGENTS.md` 与全局 `AGENTS.md`。
+2. 服务端按目标路径区分项目与全局作用域。项目文件采集确定性仓库事实：`package.json` scripts/deps、锁文件类型、`go.mod`/`Makefile`/`pyproject.toml`/`Cargo.toml`、顶层目录、README 标题、现有目标文件与继承的全局 `AGENTS.md`。两个全局入口只以各自已有规则整理跨项目指令，不扫描工作区，也不把目标内容重复作为继承规则；空全局文件只生成待填写的 TODO 模板，不推断用户偏好。
 3. 一次模型调用（可选模型，默认 `agentDefaultModel`），输出上限固定；提示词要求「只写事实里存在的命令，缺失就省略」。
 4. 目标文件已存在 → 不直接覆盖，生成**改进提案**：服务端算行级 diff，返回 hunks；前端逐块「接受/拒绝」，接受后合并成新内容再走一次正常保存（带版本令牌与备份）。
 5. 目标不存在 → 显示完整草稿，确认后写入。

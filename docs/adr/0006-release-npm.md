@@ -1,6 +1,7 @@
 # ADR-0006 发布形态：开源 + npm，名字 `dsh-agents-desk`
 
 - 状态：已决（2026-10-22）
+- v0.2 现状：仓库直接维护 `lib/` 手写产物（host + client，无构建步骤/CI）；兼容性由 `engines.dsh` 声明并生效，`dsh.compat.testedOn` 仅作文档说明；启动自检尚未实现。
 
 ## 背景
 
