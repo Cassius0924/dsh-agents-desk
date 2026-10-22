@@ -13,6 +13,14 @@ Built for DSH **0.2.1-rc.2**.
 - **Editor comforts**: unsaved-change marker and guard, Ctrl/Cmd+S, Markdown preview, stale-response protection when switching workspaces quickly, and cancellable history diffs. Small edits in large files stay localized in proposals, and accepting large proposals avoids JavaScript argument-limit errors.
 - **zh / en** UI, follows the host language.
 
+## Settings UI
+
+The interface follows the supplied OpenDesign visual system: searchable workspace/file pickers, **Editor / Effective chain / Save history** tabs, a Markdown editor/preview, reviewable model proposals, and native confirmation dialogs. Switching tabs preserves unsaved edits.
+
+The plugin fills the settings column. DSH's options container owns the outer 24px gutters; the plugin does not add a standalone width cap or a second horizontal inset. The outer panel, heading and tabs are transparent against the host background. Internal editor/control spacing remains independent. Styles are isolated to the plugin and neutral surfaces follow the host's light/dark theme.
+
+The reference export is archived in `docs/design/opendesign/`; production integration and the boundary between the host and plugin are documented in `docs/design/integration.md`. The runtime uses host APIs, not the export's simulated data or localStorage database.
+
 ## Install
 
 ```sh
@@ -63,6 +71,6 @@ Optional real-browser smoke test, using a DSH checkout's React 18 and Playwright
 DSH_ROOT=/path/to/deepseek-harness node test/browser.mjs
 ```
 
-This mounts the actual client bundle against fixture workspace/model responses, not a live DSH session. It checks versioned rollback, closing an in-flight diff, applying and saving a 150,000-line proposal, mobile overflow, and global draft labeling/application. Set `BROWSER_SCREENSHOT_DIR` to save desktop/mobile screenshots. It does not contact a model or edit real instruction files.
+This mounts the actual client bundle against fixture workspace/model responses, not a live DSH session. It checks draft-preserving tabs/preview/picker interactions, modal keyboard protection, versioned rollback, closing an in-flight diff, applying and saving a 150,000-line proposal, global draft labeling/application, nine responsive viewports, style isolation, and host-owned gutter alignment. Set `BROWSER_SCREENSHOT_DIR` to save representative desktop/mobile light/dark screenshots. It does not contact a model or edit real instruction files.
 
 MIT.
